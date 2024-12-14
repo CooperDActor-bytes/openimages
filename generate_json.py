@@ -1,25 +1,50 @@
-import os
 import json
+import os
+import sys
 
-repo_url = "https://openimg.saltyaus.space/images"
+# Log inputs
+print(f"Arguments passed to script: {sys.argv}")
 
-def generate_json():
-    image_data = []
-    base_path = "images"
+if len(sys.argv) < 2:
+    print("No image file provided.")
+    sys.exit(1)
 
-    for category in os.listdir(base_path):
-        category_path = os.path.join(base_path, category)
-        if os.path.isdir(category_path):
-            for image in os.listdir(category_path):
-                if image.endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                    image_data.append({
-                        "category": category,
-                        "name": os.path.splitext(image)[0],
-                        "url": f"{repo_url}/{category}/{image}"
-                    })
+image_path = sys.argv[1]
+print(f"Processing image: {image_path}")
 
-    with open('images.json', 'w') as json_file:
-        json.dump(image_data, json_file, indent=2)
+# Ensure images.json exists
+json_path = "images.json"
+if not os.path.exists(json_path):
+    print(f"{json_path} not found. Creating a new file.")
+    with open(json_path, "w") as f:
+        json.dump([], f)
 
-if __name__ == "__main__":
-    generate_json()
+# Load existing data
+with open(json_path, "r") as f:
+    data = json.load(f)
+
+# Extract category and image name
+category, image_name = os.path.split(image_path)[-2:]
+image_url = f"http://openimg.saltyaus.space/images/{category}/{image_name}"
+
+print(f"Category: {category}, Image Name: {image_name}, URL: {image_url}")
+
+# Avoid duplicates
+if any(entry["url"] == image_url for entry in data):
+    print(f"Image {image_url} already exists in images.json. Skipping.")
+    sys.exit(0)
+
+# Add a new entry
+entry = {
+    "category": category,
+    "name": image_name,
+    "url": image_url,
+    "description": f"Description for {image_name}"  # Placeholder
+}
+data.append(entry)
+
+# Save updated data
+with open(json_path, "w") as f:
+    json.dump(data, f, indent=4)
+
+print(f"Added {image_url} to images.json")
