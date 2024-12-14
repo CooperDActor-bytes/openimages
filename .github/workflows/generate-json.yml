@@ -1,4 +1,4 @@
-name: Generate images.json
+name: Add New Images to JSON
 
 on:
   push:
@@ -7,45 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-json:
+  update-json:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Bash and Dependencies
+      # Step 2: Set up dependencies
+      - name: Set up Bash and Install jq
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq # Optional for more advanced JSON handling
+          sudo apt-get install -y jq
 
-      - name: Generate images.json
+      # Step 3: Run the script to update images.json
+      - name: Update images.json
         run: |
-          # Define the base URL and image structure
-          BASE_URL="http://openimg.saltyaus.space/images"
-          IMAGES_DIR="images"
-          JSON_FILE="images.json"
+          chmod +x ./update_images.sh
+          ./update_images.sh
 
-          # Run the JSON generation script
-          echo "[" > $JSON_FILE
-          FIRST_ENTRY=true
-          for category in $(find $IMAGES_DIR -mindepth 1 -type d -exec basename {} \;); do
-            for image in $(find $IMAGES_DIR/$category -type f -name "*.jpg" -exec basename {} \;); do
-              if [ "$FIRST_ENTRY" = true ]; then
-                FIRST_ENTRY=false
-              else
-                echo "," >> $JSON_FILE
-              fi
-              echo "  {" >> $JSON_FILE
-              echo "    \"url\": \"$BASE_URL/$category/$image\"," >> $JSON_FILE
-              echo "    \"name\": \"$(basename "$image" .jpg)\"," >> $JSON_FILE
-              echo "    \"category\": \"$category\"" >> $JSON_FILE
-              echo "  }" >> $JSON_FILE
-            done
-          done
-          echo "]" >> $JSON_FILE
-          echo "images.json generated successfully."
-
+      # Step 4: Commit and push the updated JSON file
       - name: Commit and Push Changes
         run: |
           git config --global user.name "GitHub Actions"
