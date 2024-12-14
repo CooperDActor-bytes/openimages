@@ -3,10 +3,14 @@ name: Process Image Manually
 on:
   workflow_dispatch:
     inputs:
-      image_name:
-        description: 'The name of the image to process'
+      category:
+        description: 'Category of the image (e.g., nature, animals)'
         required: true
-        default: 'image.jpg'
+        default: 'nature'  # Default category, can be changed manually
+      image_name:
+        description: 'The name of the image to process (e.g., 1.jpg)'
+        required: true
+        default: 'image.jpg'  # Default image name, can be changed manually
 
 jobs:
   process-image:
@@ -29,5 +33,5 @@ jobs:
       - name: Run image processing script
         run: |
           # Combine category and image name into the full path
-          IMAGE_PATH="images/${{ github.event.inputs.image_name }}"
+          IMAGE_PATH="images/${{ github.event.inputs.category }}/${{ github.event.inputs.image_name }}"
           python process_image.py $IMAGE_PATH
