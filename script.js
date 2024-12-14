@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const response = await fetch("images.json");
   const images = await response.json();
 
-  // Display all images
+  // Render images in gallery
   const displayImages = (imagesToShow) => {
     gallery.innerHTML = ""; // Clear gallery
     imagesToShow.forEach((image) => {
@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.innerHTML = `
         <img src="${image.url}" alt="${image.name}">
         <div class="card-info">
-          <h3>${image.name}</h3>
-          <p>${image.category}</p>
+          <h5>${image.name}</h5>
+          <p class="text-muted">${image.category}</p>
         </div>
       `;
       gallery.appendChild(card);
