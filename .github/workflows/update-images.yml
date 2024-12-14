@@ -51,7 +51,7 @@ jobs:
                     headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
                     json={
                         "model": "image-alpha-001",
-                        "prompt": f"Describe the following image for a gallery title:",
+                        "prompt": f"Describe the following image for a gallery description:",
                     },
                     files={"file": f},
                 )
@@ -73,7 +73,6 @@ jobs:
                             # Append to JSON
                             images_data.append({
                                 "url": f"{BASE_URL}/{category}/{image_name}",
-                                "name": os.path.splitext(image_name)[0],
                                 "category": category,
                                 "description": description
                             })
