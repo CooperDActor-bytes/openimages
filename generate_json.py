@@ -1,7 +1,7 @@
 import os
 import json
 
-repo_url = "https://your-username.github.io/your-repo/images"
+repo_url = "https://openimg.saltyaus.space/images"
 
 def generate_json():
     image_data = []
