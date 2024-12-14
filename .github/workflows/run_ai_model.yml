@@ -1,0 +1,22 @@
+name: Run AI Model in AI Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-ai-model-workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Main Repo
+        uses: actions/checkout@v3
+
+      - name: Trigger AI Model Repo Workflow
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          repository: CooperDActor-bytes/saltyimgai \
+          workflow: ai_model_workflow.yml  
+          ref: main  
+          token: ${{ secrets.GITHUB_TOKEN }}  
