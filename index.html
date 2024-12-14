@@ -3,19 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenImages</title>
+  <title>Image Gallery</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Image's</h1>
-    <input type="text" id="search-bar" placeholder="Search images...">
-    <div id="category-filter"></div>
-  </header>
-  <main id="gallery"></main>
-  <footer>
-    <p>&copy; 2024 Cooper Alexander D'Andilly & SaltyMedia</p>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">Image Gallery</a>
+      <form class="d-flex" role="search">
+        <input id="search-bar" class="form-control me-2" type="search" placeholder="Search images..." aria-label="Search">
+      </form>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container my-4">
+    <h1 class="text-center mb-4">Explore Images</h1>
+    <div id="category-filter" class="mb-4"></div>
+    <div id="gallery" class="row g-3"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light text-center py-3">
+    <p>&copy; 2024 SaltyMedia. All rights reserved.</p>
   </footer>
 </body>
 </html>
