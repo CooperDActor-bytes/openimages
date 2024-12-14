@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${image.url}" alt="${image.name}">
+        <img src="${image.url}" alt="${image.name}" loading="lazy">
         <div class="card-info">
           <h5>${image.name}</h5>
           <p class="text-muted">${image.category}</p>
