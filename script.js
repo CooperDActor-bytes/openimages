@@ -1,37 +1,39 @@
-// Fetch JSON data and display images
-async function loadImages() {
-  const response = await fetch('images.json'); // URL of the JSON file
+document.addEventListener("DOMContentLoaded", async () => {
+  const gallery = document.getElementById("gallery");
+  const searchBar = document.getElementById("search-bar");
+
+  // Fetch image data
+  const response = await fetch("images.json");
   const images = await response.json();
-  
-  const gallery = document.getElementById('gallery');
-  const searchInput = document.getElementById('search');
 
-  function displayImages(filter = '') {
-    gallery.innerHTML = ''; // Clear existing content
-    const filteredImages = images.filter(image => 
-      image.name.toLowerCase().includes(filter) ||
-      image.category.toLowerCase().includes(filter)
-    );
-
-    filteredImages.forEach(image => {
-      const card = document.createElement('div');
-      card.className = 'image-card';
+  // Display all images
+  const displayImages = (imagesToShow) => {
+    gallery.innerHTML = ""; // Clear gallery
+    imagesToShow.forEach((image) => {
+      const card = document.createElement("div");
+      card.className = "card";
       card.innerHTML = `
         <img src="${image.url}" alt="${image.name}">
-        <p>${image.name} (${image.category})</p>
+        <div class="card-info">
+          <h3>${image.name}</h3>
+          <p>${image.category}</p>
+        </div>
       `;
       gallery.appendChild(card);
     });
-  }
+  };
 
-  // Initial display of all images
-  displayImages();
+  // Initial display
+  displayImages(images);
 
-  // Add search functionality
-  searchInput.addEventListener('input', () => {
-    const filter = searchInput.value.toLowerCase();
-    displayImages(filter);
+  // Search functionality
+  searchBar.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filteredImages = images.filter(
+      (image) =>
+        image.name.toLowerCase().includes(searchTerm) ||
+        image.category.toLowerCase().includes(searchTerm)
+    );
+    displayImages(filteredImages);
   });
-}
-
-loadImages();
+});
