@@ -1,4 +1,4 @@
-name: Add New Images to JSON
+name: Update Images and Generate JSON
 
 on:
   push:
@@ -15,11 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up dependencies
-      - name: Set up Bash and Install jq
+      # Step 2: Set up Python and install dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq
+          python -m pip install --upgrade pip
+          pip install torch torchvision transformers pillow
 
       # Step 3: Run the script to update images.json
       - name: Update images.json
@@ -27,11 +28,17 @@ jobs:
           chmod +x ./update_images.sh
           ./update_images.sh
 
-      # Step 4: Commit and push the updated JSON file
+      # Step 4: Commit and Push Changes (images.json only)
       - name: Commit and Push Changes
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+
+          # Stage only the images.json file
           git add images.json
-          git diff --quiet || git commit -m "Update images.json with new images"
+
+          # Commit changes if there are any
+          git diff --cached --quiet || git commit -m "Update images.json with new images"
+
+          # Push changes
           git push || echo "No changes to push"
