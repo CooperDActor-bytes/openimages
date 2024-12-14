@@ -34,19 +34,6 @@ jobs:
 
       - name: Commit processed images and update images.json
         run: |
-          CATEGORY="processed"
-          IMAGE_NAME="all_images_processed.json"
-          IMAGE_DESCRIPTION="Processed all images and added new entries to images.json"
-
-          # Check if images.json exists
-          if [ ! -f images.json ]; then
-            echo "[]"> images.json  # Create an empty JSON file if it doesn't exist
-          fi
-
-          # Add new image entry to the JSON file
-          jq --arg category "$CATEGORY" --arg name "$IMAGE_NAME" --arg desc "$IMAGE_DESCRIPTION" \
-            '. += [{"category": $category, "name": $name, "description": $desc}]' images.json > tmp.json && mv tmp.json images.json
-
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add images.json
@@ -54,8 +41,7 @@ jobs:
           git push
 
       - name: Trigger Static Site Generation (static.yml)
-        uses: peter-evans/workflow-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2  # Corrected action name
         with:
-          repository: ${{ github.repository }}  # Use the same repository
-          workflow: static.yml  # Name of the workflow to trigger
-          ref: refs/heads/main  # Specify the branch to trigger it on (default is main)
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ 
