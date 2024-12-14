@@ -1,44 +1,54 @@
-name: Update Images and Generate JSON
+name: Generate Images JSON
 
 on:
-  push:
+  push:    # Runs on every push
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # Allows for manual trigger
 
 jobs:
-  update-json:
+  generate-json:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # Step 2: Set up Python and install dependencies
-      - name: Install dependencies
+      - name: Generate images.json
         run: |
-          sudo apt-get update
-          python -m pip install --upgrade pip
-          pip install torch torchvision transformers pillow
+          IMAGES_DIR="images"
+          JSON_FILE="images.json"
+          BASE_URL="http://openimg.saltyaus.space/images"
+          
+          echo "[" > $JSON_FILE
+          find $IMAGES_DIR -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) | while read image_path; do
+            CATEGORY=$(basename $(dirname "$image_path"))
+            IMAGE_NAME=$(basename "$image_path")
+            TITLE=$(basename "$IMAGE_NAME" | sed 's/\.[^.]*$//') # Extract name without extension
+            echo "  {" >> $JSON_FILE
+            echo "    \"url\": \"$BASE_URL/$CATEGORY/$IMAGE_NAME\"," >> $JSON_FILE
+            echo "    \"name\": \"$TITLE\"," >> $JSON_FILE
+            echo "    \"category\": \"$CATEGORY\"" >> $JSON_FILE
+            echo "  }," >> $JSON_FILE
+          done
+          sed -i '$ s/,$//' $JSON_FILE # Remove trailing comma
+          echo "]" >> $JSON_FILE
 
-      # Step 3: Run the script to update images.json
-      - name: Update images.json
-        run: |
-          chmod +x ./update_images.sh
-          ./update_images.sh
-
-      # Step 4: Commit and Push Changes (images.json only)
-      - name: Commit and Push Changes
+      - name: Commit and Push JSON
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-
-          # Stage only the images.json file
           git add images.json
+          git commit -m "Update images.json with latest image files"
+          git push
 
-          # Commit changes if there are any
-          git diff --cached --quiet || git commit -m "Update images.json with new images"
-
-          # Push changes
-          git push || echo "No changes to push"
+      - name: Trigger static.yml workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "static.yml",
+              ref: context.ref,
+            });
+            console.log(response);
