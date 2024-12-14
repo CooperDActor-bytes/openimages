@@ -1,27 +1,45 @@
+import json
+import os
 import sys
-from PIL import Image
-import torch
-from transformers import BlipProcessor, BlipForConditionalGeneration
 
-def generate_description(image_path):
-    # Load the pre-trained BLIP model and processor
-    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-    
-    # Open the image
-    image = Image.open(image_path).convert("RGB")
+# Check if an image file was passed
+if len(sys.argv) < 2:
+    print("No image file provided.")
+    sys.exit(1)
 
-    # Preprocess the image and generate a caption
-    inputs = processor(images=image, return_tensors="pt")
-    out = model.generate(**inputs)
-    description = processor.decode(out[0], skip_special_tokens=True)
-    
-    return description
+# The image file to process
+image_path = sys.argv[1]
 
-if __name__ == "__main__":
-    image_path = sys.argv[1]  # Get the image file path from the argument
-    print(f"Processing image: {image_path}")
-    
-    # Generate and print the image description
-    description = generate_description(image_path)
-    print(f"Image Description: {description}")
+# Ensure images.json exists
+json_path = "images.json"
+if not os.path.exists(json_path):
+    with open(json_path, "w") as f:
+        json.dump([], f)
+
+# Load existing data
+with open(json_path, "r") as f:
+    data = json.load(f)
+
+# Extract category and image name
+category, image_name = os.path.split(image_path)[-2:]
+image_url = f"http://openimg.saltyaus.space/images/{category}/{image_name}"
+
+# Avoid duplicates
+if any(entry["url"] == image_url for entry in data):
+    print(f"Image {image_url} already exists in images.json. Skipping.")
+    sys.exit(0)
+
+# Add a new entry
+entry = {
+    "category": category,
+    "name": image_name,
+    "url": image_url,
+    "description": f"Description for {image_name}"  # Placeholder description
+}
+data.append(entry)
+
+# Save updated data
+with open(json_path, "w") as f:
+    json.dump(data, f, indent=4)
+
+print(f"Added {image_url} to images.json")
