@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python and Dependencies
+      - name: Set up dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y bash
@@ -23,11 +23,14 @@ jobs:
           chmod +x ./generate_images.sh
           ./generate_images.sh
 
-      - name: Commit and Push JSON
+      - name: Stage changes
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add images.json
+          git add generate_images.sh images.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "SaltyBot"
+          git config --global user.email "bots@salty.cool"
           git commit -m "Update images.json with latest image files"
           git push
 
