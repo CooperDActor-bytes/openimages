@@ -1,55 +1,55 @@
-name: Update Images JSON
+name: Generate images.json
 
 on:
   push:
     branches:
-      - main  # Runs whenever there is a push to the main branch
+      - main
+  workflow_dispatch:
 
 jobs:
-  build:
+  generate-json:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out the repository
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    # Step 2: Generate images.json
-    - name: Generate images.json
-      run: |
-        # Define the base URL for the images
-        BASE_URL="http://openimg.saltyaus.space/images"
-        
-        # Navigate to the images folder
-        IMAGES_DIR="images" # Ensure this matches your repository structure
-        JSON_FILE="images.json"
-        echo "[]" > $JSON_FILE # Initialize JSON file
+      - name: Set up Bash and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq # Optional for more advanced JSON handling
 
-        # Generate JSON content
-        echo "[" > $JSON_FILE
-        for category in $(find $IMAGES_DIR -mindepth 1 -type d -exec basename {} \;); do
-          for image in $(find $IMAGES_DIR/$category -type f -name "*.jpg" -exec basename {} \;); do
-            echo "  {" >> $JSON_FILE
-            echo "    \"url\": \"$BASE_URL/$category/$image\"," >> $JSON_FILE
-            echo "    \"name\": \"$(basename $image .jpg)\"," >> $JSON_FILE
-            echo "    \"category\": \"$category\"" >> $JSON_FILE
-            echo "  }," >> $JSON_FILE
+      - name: Generate images.json
+        run: |
+          # Define the base URL and image structure
+          BASE_URL="http://openimg.saltyaus.space/images"
+          IMAGES_DIR="images"
+          JSON_FILE="images.json"
+
+          # Run the JSON generation script
+          echo "[" > $JSON_FILE
+          FIRST_ENTRY=true
+          for category in $(find $IMAGES_DIR -mindepth 1 -type d -exec basename {} \;); do
+            for image in $(find $IMAGES_DIR/$category -type f -name "*.jpg" -exec basename {} \;); do
+              if [ "$FIRST_ENTRY" = true ]; then
+                FIRST_ENTRY=false
+              else
+                echo "," >> $JSON_FILE
+              fi
+              echo "  {" >> $JSON_FILE
+              echo "    \"url\": \"$BASE_URL/$category/$image\"," >> $JSON_FILE
+              echo "    \"name\": \"$(basename "$image" .jpg)\"," >> $JSON_FILE
+              echo "    \"category\": \"$category\"" >> $JSON_FILE
+              echo "  }" >> $JSON_FILE
+            done
           done
-        done
-        sed -i '$ s/,$//' $JSON_FILE # Remove trailing comma
-        echo "]" >> $JSON_FILE
+          echo "]" >> $JSON_FILE
+          echo "images.json generated successfully."
 
-    # Step 3: Commit and push the changes
-    - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.name "SaltyBot[bot]"
-        git config --global user.email "bots@salty.cool"
-        git add images.json
-        if git diff-index --quiet HEAD; then
-          echo "No changes to commit."
-        else
-          git commit -m "autoupdate images.json"
-          git push
-        fi
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add images.json
+          git diff --quiet || git commit -m "Update images.json with new images"
+          git push || echo "No changes to push"
