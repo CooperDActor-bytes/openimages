@@ -4,20 +4,20 @@ body {
   padding: 0;
 }
 
-/* Gallery image cards */
-.card {
-  transition: transform 0.2s ease;
+.card-title {
+  color: black;
+  transition: color 0.3s ease;
 }
 
-.card:hover {
-  transform: scale(1.05);
-}
-
-/* Dark mode support */
+/* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #121212;
     color: #ffffff;
+  }
+
+  .card-title {
+    color: #007bff; /* Blue title in dark mode */
   }
 
   .navbar,
