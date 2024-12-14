@@ -3,14 +3,10 @@ name: Process Image Manually
 on:
   workflow_dispatch:
     inputs:
-      category:
-        description: 'Category of the image'
-        required: true
-        default: 'nature'  # Default category, can be changed when triggering manually
       image_name:
         description: 'The name of the image to process'
         required: true
-        default: 'image.jpg'  # Default image name
+        default: 'image.jpg'
 
 jobs:
   process-image:
@@ -28,10 +24,10 @@ jobs:
         run: |
           sudo apt-get update
           python -m pip install --upgrade pip
-          pip install pillow torch  # Install both Pillow and PyTorch
+          pip install pillow torch transformers numpy  # Install Pillow, PyTorch, Transformers, and NumPy
 
       - name: Run image processing script
         run: |
           # Combine category and image name into the full path
-          IMAGE_PATH="images/${{ github.event.inputs.category }}/${{ github.event.inputs.image_name }}"
+          IMAGE_PATH="images/${{ github.event.inputs.image_name }}"
           python process_image.py $IMAGE_PATH
