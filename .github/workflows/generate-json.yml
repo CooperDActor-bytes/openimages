@@ -3,9 +3,7 @@ name: Update Images JSON
 on:
   push:
     branches:
-      - main
-  schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight UTC
+      - main  # Runs whenever there is a push to the main branch
 
 jobs:
   build:
@@ -49,5 +47,9 @@ jobs:
         git config --global user.name "SaltyBot[bot]"
         git config --global user.email "bots@salty.cool"
         git add images.json
-        git commit -m "images.json autoupdate"
-        git push
+        if git diff-index --quiet HEAD; then
+          echo "No changes to commit."
+        else
+          git commit -m "autoupdate images.json"
+          git push
+        fi
