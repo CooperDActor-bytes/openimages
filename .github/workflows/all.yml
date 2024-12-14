@@ -1,0 +1,61 @@
+name: Process All JPG Images
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+jobs:
+  process-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          python -m pip install --upgrade pip
+          pip install pillow torch transformers numpy
+
+      - name: Process all JPG images
+        run: |
+          # Iterate over all .jpg files in the repository
+          for image in $(find . -type f -iname "*.jpg"); do
+            echo "Processing image: $image"
+            python process_image.py $image  # Your image processing script
+          done
+
+      - name: Commit processed images and update images.json
+        run: |
+          CATEGORY="processed"
+          IMAGE_NAME="all_images_processed.json"
+          IMAGE_DESCRIPTION="Processed all images and added new entries to images.json"
+
+          # Check if images.json exists
+          if [ ! -f images.json ]; then
+            echo "[]"> images.json  # Create an empty JSON file if it doesn't exist
+          fi
+
+          # Add new image entry to the JSON file
+          jq --arg category "$CATEGORY" --arg name "$IMAGE_NAME" --arg desc "$IMAGE_DESCRIPTION" \
+            '. += [{"category": $category, "name": $name, "description": $desc}]' images.json > tmp.json && mv tmp.json images.json
+
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add images.json
+          git commit -m "Update images.json with processed images"
+          git push
+
+      - name: Trigger Static Site Generation (static.yml)
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          repository: ${{ github.repository }}  # Use the same repository
+          workflow: static.yml  # Name of the workflow to trigger
+          ref: refs/heads/main  # Specify the branch to trigger it on (default is main)
