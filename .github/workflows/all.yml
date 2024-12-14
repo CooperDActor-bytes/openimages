@@ -44,4 +44,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v2  # Corrected action name
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ 
+          repository: ${{ github.repository }}  # Use the same repository
+          event-type: trigger-static  # Event type to trigger `static.yml`
