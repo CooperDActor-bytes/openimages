@@ -1,62 +1,30 @@
 #!/bin/bash
 
-# Define variables
+# Define the base URL for the images
 BASE_URL="http://openimg.saltyaus.space/images"
-IMAGES_DIR="images"
+
+# Navigate to the images folder
+IMAGES_DIR="images" # Ensure this matches your repository structure
 JSON_FILE="images.json"
 
-# Initialize JSON file if it doesn't exist
-if [ ! -f "$JSON_FILE" ]; then
-  echo "[]" > "$JSON_FILE"
-fi
+# Start the JSON array
+echo "[" > $JSON_FILE
 
-# Read existing JSON data into a variable
-EXISTING_JSON=$(cat "$JSON_FILE")
+# Loop through all categories and images
+for category in $(find $IMAGES_DIR -mindepth 1 -type d -exec basename {} \;); do
+  for image_path in $(find $IMAGES_DIR/$category -type f -name "*.jpg"); do
+    # Generate a description using the Python script
+    description=$(python generate_description.py "$image_path")
 
-# Function to check if an image entry exists in the JSON
-function image_exists {
-  local url="$1"
-  echo "$EXISTING_JSON" | grep -q "\"url\": \"$url\""
-}
-
-# Process all images in the repository
-NEW_ENTRIES=()
-for category in $(find "$IMAGES_DIR" -mindepth 1 -type d -exec basename {} \;); do
-  for image in $(find "$IMAGES_DIR/$category" -type f -name "*.jpg" -exec basename {} \;); do
-    IMAGE_URL="$BASE_URL/$category/$image"
-    IMAGE_NAME="$(basename "$image" .jpg)"
-    
-    # Skip if the image already exists in the JSON
-    if image_exists "$IMAGE_URL"; then
-      echo "Image $IMAGE_URL already exists in $JSON_FILE. Skipping..."
-      continue
-    fi
-
-    # Add new entry for this image
-    NEW_ENTRY=$(cat <<EOF
-{
-  "url": "$IMAGE_URL",
-  "name": "$IMAGE_NAME",
-  "category": "$category"
-}
-EOF
-)
-    NEW_ENTRIES+=("$NEW_ENTRY")
+    # Append to the JSON file
+    echo "  {" >> $JSON_FILE
+    echo "    \"url\": \"$BASE_URL/$category/$(basename $image_path)\"," >> $JSON_FILE
+    echo "    \"name\": \"$description\"," >> $JSON_FILE
+    echo "    \"category\": \"$category\"" >> $JSON_FILE
+    echo "  }," >> $JSON_FILE
   done
 done
 
-# Append new entries to the JSON file
-if [ ${#NEW_ENTRIES[@]} -gt 0 ]; then
-  # Remove the closing bracket and append new entries
-  jq '. |= .[:-1]' "$JSON_FILE" > tmp.json && mv tmp.json "$JSON_FILE"
-  for entry in "${NEW_ENTRIES[@]}"; do
-    echo "  $entry," >> "$JSON_FILE"
-  done
-
-  # Remove trailing comma and close the JSON array
-  sed -i '$ s/,$//' "$JSON_FILE"
-  echo "]" >> "$JSON_FILE"
-  echo "New images have been added to $JSON_FILE."
-else
-  echo "No new images found. $JSON_FILE is up-to-date."
-fi
+# Remove trailing comma and close the JSON array
+sed -i '$ s/,$//' $JSON_FILE
+echo "]" >> $JSON_FILE
