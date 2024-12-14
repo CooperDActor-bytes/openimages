@@ -1,0 +1,17 @@
+[
+  {
+    "category": "category1",
+    "name": "image1",
+    "url": "https://your-repo.github.io/images/category1/image1.jpg"
+  },
+  {
+    "category": "category1",
+    "name": "image2",
+    "url": "https://your-repo.github.io/images/category1/image2.jpg"
+  },
+  {
+    "category": "category2",
+    "name": "image3",
+    "url": "https://your-repo.github.io/images/category2/image3.jpg"
+  }
+]
