@@ -3,7 +3,7 @@ name: Process All JPG Images
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
 
 jobs:
   process-images:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
@@ -26,15 +26,12 @@ jobs:
 
       - name: Process all JPG images
         run: |
-          # Iterate over all .jpg files in the repository
-          for image in $(find . -type f -iname "*.jpg"); do
-            echo "Processing image: $image"
-            python process_image.py $image  # Your image processing script
+          for image in $(find ./images -type f -iname "*.jpg"); do
+            echo "Processing $image"
+            python process_image.py "$image"
           done
 
-      # This step is optional if you need to update `images.json` only when new files are processed.
-      - name: Commit changes to images.json (if any)
-        if: success()
+      - name: Commit changes to images.json
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -42,7 +39,7 @@ jobs:
           git diff --quiet && echo "No changes to commit" || git commit -m "Update images.json with processed images"
           git push || echo "No changes to push"
 
-      - name: Trigger Static Site Generation (static.yml)
+      - name: Trigger Static Site Generation
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
