@@ -1,0 +1,26 @@
+name: Process Image Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_name:
+        description: 'The name of the image to process'
+        required: true
+        default: 'image.jpg'
+
+jobs:
+  process-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          python -m pip install --upgrade pip
+          pip install pillow
+
+      - name: Run image processing script
+        run: |
+          python process_image.py ${{ github.event.inputs.image_name }}
