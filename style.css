@@ -1,42 +1,54 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
+/* style.css */
 
-.card-title {
-  color: black;
-  transition: color 0.3s ease;
-}
-
-/* Dark mode styles */
+/* Dark mode styling */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #121212;
-    color: #ffffff;
+    background-color: #333;
+    color: white;
+  }
+
+  .navbar-light {
+    background-color: #444;
+  }
+
+  .card {
+    background-color: #555;
+    border-color: #666;
   }
 
   .card-title {
-    color: #007bff; /* Blue title in dark mode */
+    color: #3399ff; /* Blue color for titles */
   }
 
-  .navbar,
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
   footer {
-    background-color: #1f1f1f;
+    background-color: #222;
   }
+}
 
-  .navbar a,
-  footer p {
-    color: #ffffff;
-  }
+/* Additional styles for light mode */
+body {
+  background-color: #f8f9fa;
+  color: #333;
+}
 
-  .btn {
-    border-color: #ffffff;
-    color: #ffffff;
-  }
+.navbar-light {
+  background-color: #f8f9fa;
+}
 
-  .btn:hover {
-    background-color: #ffffff;
-    color: #121212;
-  }
+.card {
+  background-color: white;
+  border-color: #ddd;
+}
+
+.card-title {
+  color: #007bff; /* Blue color for titles */
+}
+
+footer {
+  background-color: #f1f1f1;
 }
