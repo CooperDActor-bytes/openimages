@@ -1,7 +1,10 @@
 /* General Styles */
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* Light mode background */
+  color: #333; /* Light mode text color */
 }
 
 h1 {
@@ -22,7 +25,7 @@ h1 {
 }
 
 .card {
-  background: white;
+  background: white; /* Light mode card background */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -41,12 +44,25 @@ h1 {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.card-info {
-  padding: 10px;
-  text-align: center;
+footer {
+  background-color: #343a40; /* Dark footer for light mode */
+  color: #ffffff;
 }
 
-footer {
-  background-color: #343a40;
-  color: #ffffff;
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212; /* Dark mode background */
+    color: #e0e0e0; /* Dark mode text color */
+  }
+
+  .card {
+    background: #1e1e1e; /* Dark mode card background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  header, footer {
+    background-color: #1e1e1e; /* Dark mode header/footer */
+    color: #e0e0e0;
+  }
 }
