@@ -1,22 +1,20 @@
-name: Run AI Model in AI Repo
+name: Trigger Another Workflow on Image Upload
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - "images/**"  # Trigger this workflow when an image file is pushed to the "images" folder
 
 jobs:
-  trigger-ai-model-workflow:
+  trigger-workflow:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Main Repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Trigger AI Model Repo Workflow
-        uses: peter-evans/workflow-dispatch@v1
+      - name: Trigger another repository workflow
+        uses: peter-evans/repository-dispatch@v1
         with:
-          repository: CooperDActor-bytes/saltyimgai \
-          workflow: ai_model_workflow.yml  
-          ref: main  
-          token: ${{ secrets.GITHUB_TOKEN }}  
+          repository: your-username/your-repo  # Specify the target repository
+          event-type: trigger-image-processing  # This is the custom event you'll listen to
+          token: ${{ secrets.GITHUB_TOKEN }}  # Authentication token for triggering workflows
